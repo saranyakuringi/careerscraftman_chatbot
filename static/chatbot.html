@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interaction</title>
+    <!-- External CSS stylesheets -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Custom CSS styles -->
+    <style>
+        /* Body styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        /* Container styles */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Chat box styles */
+        .chat-box {
+            border: 1px solid #ced4da;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px  #fff;
+            min-height: 400px;
+            overflow-y: auto;
+        }
+        /* Message styles */
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        /* User message styles */
+        .user-message {
+            background-color: #007bff;
+            color: #fff;
+            text-align: right;
+        }
+        /* Bot message styles */
+        .bot-message {
+            background-color: #28a745;
+            color: #fff;
+            text-align: left;
+        }
+        /* User icon styles */
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            float: right;
+            margin-left: 10px;
+        }
+        /* Bot icon styles */
+        .bot-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            float: left;
+            margin-right: 10px;
+        }
+        /* Input field and button styles */
+        #messageInput {
+            width: calc(100% - 80px);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            outline: none;
+        }
+        #sendBtn {
+            width: 80px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #sendBtn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Welcome, <span id="username"></span>!</h1>
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <form id="chatForm" class="mt-4">
+            <input type="text" id="messageInput" placeholder="Type your message..." required>
+            <button type="submit" id="sendBtn">Send</button>
+        </form>
+    </div>
+    
+    <!-- External JavaScript libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- Custom JavaScript code -->
+    <script>
+        $(document).ready(function() {
+            // Get the username from local storage
+            var username = localStorage.getItem('username');
+            if (username) {
+                $("#username").text(username);
+            }
+
+            $("#chatForm").submit(function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Get the user's message
+                var message = $("#messageInput").val();
+
+                // Display the user's message in the chat box
+                displayMessage("user", message);
+
+                // Send user query to server for processing
+                $.ajax({
+                    type: "POST",
+                    url: "/query",
+                    contentType: "application/json",
+                    data: JSON.stringify({ query: message }),
+                    success: function(response) {
+                        // Display the bot's response in the chat box
+                        displayMessage("bot", response.response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error processing query:", error);
+                        // Display an error message in the chat box
+                        displayMessage("bot", "Oops! Something went wrong. Please try again later.");
+                    }
+                });
+
+                // Clear the input field
+                $("#messageInput").val("");
+            });
+        });
+
+        // Function to display messages in the chat box
+        function displayMessage(sender, message) {
+            var chatBox = $("#chatBox");
+            var messageClass = sender === "user" ? "user-message" : "bot-message";
+            var messageElement = $("<div>").addClass("message").addClass(messageClass);
+            var iconElement = $("<div>").addClass(sender + "-icon").html(sender === "user" ? "&#128100;" : "&#128102;");
+            messageElement.append(iconElement).append(message);
+            chatBox.append(messageElement);
+
+            // Automatically scroll to the bottom of the chat box
+            chatBox.scrollTop(chatBox[0].scrollHeight);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCraftMan Bot</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://kit.fontawesome.com/854e65de19.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Sign in</h1>
+            
+            <form id="signinForm">
+                <div class="input-group">
+                   
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" name="username" id="usernameInput" placeholder="UserName"> 
+                    </div>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" name="password" id="passwordInput" placeholder="Password"> 
+                    </div>
+                   
+                </div>
+                <div class="btn-field">
+                    <button type="submit" id="signinBtn">Sign In</button>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+    document.getElementById("signinForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Gather form data
+        var formData = {
+            
+            username: document.getElementById("usernameInput").value,
+            password: document.getElementById("passwordInput").value
+        };
+
+        // Send AJAX request to the server
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/signin");
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    // Successful signup, redirect to signup success page
+                    window.location.href = "/chatbot";
+                } else {
+                    // Signup failed, handle error
+                    console.error("Signup failed:", xhr.responseText);
+                }
+            }
+        };
+        xhr.send(JSON.stringify(formData));
+    });
+
+    
+</script>
+        
+</body>
+</html>
+
+
+
